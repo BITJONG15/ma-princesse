@@ -8,6 +8,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Heart, Stars, Gift, Music, Sparkles, ChevronRight, ChevronLeft, Quote, Camera, Mail } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+import img1 from './assets/IMG-20251227-WA0081.jpg';
+import img2 from './assets/IMG-20251227-WA0078.jpg';
+import img3 from './assets/IMG-20251227-WA0080.jpg';
+import img4 from './assets/IMG-20260322-WA0078.jpg';
+
 const compliments = [
   "Ton sourire illumine mes journées.",
   "Tu es la personne la plus douce que je connaisse.",
@@ -20,10 +25,10 @@ const compliments = [
 ];
 
 const images = [
-  "/IMG-20251227-WA0081.jpg",
-  "/IMG-20251227-WA0078.jpg",
-  "/IMG-20251227-WA0080.jpg",
-  "/IMG-20260322-WA0078.jpg"
+  img1,
+  img2,
+  img3,
+  img4
 ];
 
 export default function App() {
