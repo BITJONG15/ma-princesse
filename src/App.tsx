@@ -8,11 +8,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Heart, Stars, Gift, Music, Sparkles, ChevronRight, ChevronLeft, Quote, Camera, Mail } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-import img1 from './assets/IMG-20251227-WA0081.jpg';
-import img2 from './assets/IMG-20251227-WA0078.jpg';
-import img3 from './assets/IMG-20251227-WA0080.jpg';
-import img4 from './assets/IMG-20260322-WA0078.jpg';
-
 const compliments = [
   "Ton sourire illumine mes journées.",
   "Tu es la personne la plus douce que je connaisse.",
@@ -24,19 +19,11 @@ const compliments = [
   "Je t'aime plus que les mots ne peuvent le dire."
 ];
 
-const images = [
-  img1,
-  img2,
-  img3,
-  img4
-];
-
 export default function App() {
   const [step, setStep] = useState(0);
   const [showMessage, setShowMessage] = useState(false);
   const [activeCompliment, setActiveCompliment] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [selectedGift, setSelectedGift] = useState<string | null>(null);
   const [clickHearts, setClickHearts] = useState<{id: number, x: number, y: number}[]>([]);
 
   const handleInteraction = (e: React.MouseEvent | React.TouchEvent) => {
@@ -60,16 +47,6 @@ export default function App() {
     setTimeout(() => {
       setClickHearts(prev => prev.filter(h => h.id !== newHeart.id));
     }, 1500);
-  };
-
-  const paginate = (newDirection: number) => {
-    setDirection(newDirection);
-    setCurrentIndex((prev) => {
-      let next = prev + newDirection;
-      if (next < 0) return images.length - 1;
-      if (next >= images.length) return 0;
-      return next;
-    });
   };
 
   useEffect(() => {
@@ -172,6 +149,19 @@ export default function App() {
               <p className="font-elegant text-xl md:text-2xl text-white/70 mb-10 max-w-md mx-auto leading-relaxed">
                 Un petit voyage magique préparé juste pour toi, en ce jour si spécial.
               </p>
+
+              {selectedGift && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-10 p-6 glass-card border-romantic-pink/50 inline-block"
+                >
+                  <p className="text-romantic-pink font-serif text-xl mb-2">Ton choix de cadeau :</p>
+                  <p className="text-2xl font-bold text-white">{selectedGift}</p>
+                  <p className="text-sm text-white/70 mt-2">Excellent choix mon amour ! ❤️</p>
+                </motion.div>
+              )}
+
               <button
                 onClick={() => setStep(1)}
                 className="px-8 py-4 bg-white text-black rounded-full font-semibold flex items-center gap-2 hover:bg-romantic-pink hover:text-white transition-all duration-300 group"
@@ -282,8 +272,8 @@ export default function App() {
                   onClick={() => setStep(2)}
                   className="px-6 py-3 bg-romantic-pink/20 border border-romantic-pink/50 text-white rounded-full font-semibold flex items-center gap-3 hover:bg-romantic-pink hover:text-white transition-all duration-300 shadow-[0_0_20px_rgba(255,133,162,0.3)] hover:shadow-[0_0_30px_rgba(255,133,162,0.6)]"
                 >
-                  <Camera className="w-5 h-5" />
-                  Notre album
+                  <Gift className="w-5 h-5" />
+                  Ton Cadeau
                 </button>
                 <button
                   onClick={() => setStep(3)}
@@ -308,102 +298,69 @@ export default function App() {
 
           {step === 2 && (
             <motion.div
-              key="album"
+              key="gifts"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.1 }}
               className="w-full max-w-4xl z-10 flex flex-col items-center"
             >
-              <h2 className="font-serif text-5xl md:text-6xl mb-8 text-gradient text-center">
-                Tes Plus Beaux Sourires
+              <h2 className="font-serif text-4xl md:text-6xl mb-4 text-gradient text-center">
+                Choisis ton cadeau
               </h2>
-              
-              <div className="relative w-full max-w-md aspect-[3/4] md:aspect-square mx-auto flex items-center justify-center">
-                <AnimatePresence initial={false} custom={direction}>
-                  <motion.div
-                    key={currentIndex}
-                    custom={direction}
-                    variants={{
-                      enter: (dir: number) => ({
-                        x: dir > 0 ? 300 : -300,
-                        opacity: 0,
-                        scale: 0.8,
-                      }),
-                      center: {
-                        zIndex: 1,
-                        x: 0,
-                        opacity: 1,
-                        scale: 1,
-                      },
-                      exit: (dir: number) => ({
-                        zIndex: 0,
-                        x: dir < 0 ? 300 : -300,
-                        opacity: 0,
-                        scale: 0.8,
-                      })
-                    }}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{
-                      x: { type: "spring", stiffness: 300, damping: 30 },
-                      opacity: { duration: 0.2 },
-                      scale: { duration: 0.2 }
-                    }}
-                    drag="x"
-                    dragConstraints={{ left: 0, right: 0 }}
-                    dragElastic={1}
-                    onDragEnd={(e, { offset, velocity }) => {
-                      const swipe = Math.abs(offset.x) * velocity.x;
-                      if (swipe < -10000 || offset.x < -50) {
-                        paginate(1);
-                      } else if (swipe > 10000 || offset.x > 50) {
-                        paginate(-1);
-                      }
-                    }}
-                    className="absolute w-full h-full rounded-2xl overflow-hidden glass-card shadow-2xl cursor-grab active:cursor-grabbing"
-                  >
+              <p className="text-white/80 mb-12 text-center text-lg max-w-2xl">
+                Parce que tu mérites ce qu'il y a de mieux, choisis la paire qui te fait le plus rêver...
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                {/* Option 1: Kyrie 7 */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="glass-card p-6 flex flex-col items-center text-center cursor-pointer border-2 border-transparent hover:border-romantic-pink transition-all duration-300 group"
+                  onClick={() => {
+                    setSelectedGift("je ne sais pas (surppred moi!!!!!)");
+                    setStep(0);
+                  }}
+                >
+                  <div className="w-full h-64 rounded-xl overflow-hidden mb-6 relative bg-white/5 flex items-center justify-center">
                     <img 
-                      src={images[currentIndex]} 
-                      alt={`Ladouce ${currentIndex + 1}`} 
-                      className="w-full h-full object-cover pointer-events-none"
+                      src="https://www.basketusa.com/wp-content/uploads/2021/08/Nike-Kyrie-7-1.jpeg" 
+                      alt="Kyrie 7 Violette" 
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
-                      <Heart className="text-romantic-pink w-8 h-8 animate-pulse fill-romantic-pink" />
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">je ne sais pas</h3>
+                  <p className="text-romantic-pink mb-6">surppred moi!!!!!</p>
+                  <button className="px-6 py-3 bg-white/10 rounded-full text-white group-hover:bg-romantic-pink transition-colors w-full font-semibold">
+                    Je veux celle-ci !
+                  </button>
+                </motion.div>
 
-                {/* Navigation Buttons */}
-                <button
-                  className="absolute left-2 md:-left-12 z-10 p-3 rounded-full bg-black/30 backdrop-blur-md text-white hover:bg-romantic-pink transition-colors"
-                  onClick={() => paginate(-1)}
+                {/* Option 2: Jordan 4 */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="glass-card p-6 flex flex-col items-center text-center cursor-pointer border-2 border-transparent hover:border-romantic-pink transition-all duration-300 group"
+                  onClick={() => {
+                    setSelectedGift("Jordan 4 (Rose et Blanche)");
+                    setStep(0);
+                  }}
                 >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  className="absolute right-2 md:-right-12 z-10 p-3 rounded-full bg-black/30 backdrop-blur-md text-white hover:bg-romantic-pink transition-colors"
-                  onClick={() => paginate(1)}
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Dots */}
-              <div className="flex gap-2 mt-8 z-10">
-                {images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setDirection(idx > currentIndex ? 1 : -1);
-                      setCurrentIndex(idx);
-                    }}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      idx === currentIndex ? 'bg-romantic-pink scale-125' : 'bg-white/30 hover:bg-white/50'
-                    }`}
-                  />
-                ))}
+                  <div className="w-full h-64 rounded-xl overflow-hidden mb-6 relative bg-white/5 flex items-center justify-center">
+                    <img 
+                      src="https://sneakerfortress.com/wp-content/uploads/2024/02/Air-Jordan-4-Orchid-Sneakers-1.jpg" 
+                      alt="Jordan 4 Rose et Blanche" 
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Jordan 4</h3>
+                  <p className="text-romantic-pink mb-6">Couleur Rose et Blanche</p>
+                  <button className="px-6 py-3 bg-white/10 rounded-full text-white group-hover:bg-romantic-pink transition-colors w-full font-semibold">
+                    Je veux celle-ci !
+                  </button>
+                </motion.div>
               </div>
 
               <motion.button
